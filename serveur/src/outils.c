@@ -9,6 +9,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <ctype.h>
 
 void to4char(long size, int begin_index, char *result)
 {
@@ -51,14 +52,24 @@ void to4char(long size, int begin_index, char *result)
         result[begin_index+1]=char_size[1];
         result[begin_index+2]=char_size[2];
         result[begin_index+3]=char_size[3];
-    }    
+    }
+    result[begin_index+4]='\0';
+}
+
+void strupr(char *str){
+    int i=0;
+    while (str[i]!='\0')
+    {
+        str[i] = toupper(str[i]);
+        i++;
+    }
 }
 
 void read_entete_in_pipe(int read_desc, entete *en_tete){
     char *rep_size = (char*)malloc(5*sizeof(char));
     read(read_desc, rep_size, 4);
     en_tete->size = atoi(rep_size);
-
+    free(rep_size);
     read(read_desc, en_tete->cmd, 4);
 }
 
@@ -71,7 +82,7 @@ client *create_client(int id, char *pseudo){
     cl->id = id;
     cl->pseudo = (char*)malloc((strlen(pseudo)+1)*sizeof(char));
     strcpy(cl->pseudo, pseudo);
-    cl->pipe = (char*)malloc(TUBE_CLIENT_PREFIX_PATH_SIZE*sizeof(char));
+    cl->pipe = (char*)malloc(TUBE_CLIENT_PATH_SIZE*sizeof(char));
     sprintf(cl->pipe, "%s_%d", TUBE_CLIENT_PREFIX, id);
     
     //on cree le tube du client
@@ -80,7 +91,7 @@ client *create_client(int id, char *pseudo){
         printf("Echec de la création du tube du client %d\n", id);
         exit(0);
     }
-    cl->tube_write_desc = open(cl->pipe, O_WRONLY);
+    //cl->tube_write_desc = open(cl->pipe, O_WRONLY);
     return cl;
 }
 
@@ -92,7 +103,8 @@ void clean_all_client(int total_client, client **client_list){
         free(client_list[i]->pipe);
         free(client_list[i]);
     }
-    free(client_list);
+    //la liste est un tableau
+    //free(client_list);
 }
 
 void clean_client_by_id(int total_client, client **client_list, int id){

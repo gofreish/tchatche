@@ -15,4 +15,11 @@ struct entete{
 };
 typedef struct entete entete;
 
+typedef struct data{
+    int client_id;
+    char *cmd;
+    char *parameters;
+    char *message;
+} data;
+
 #endif

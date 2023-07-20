@@ -6,7 +6,7 @@
 #define CONNECTION_FAILLED "CBAD"
 #define EXIT_CLIENT "EXIT"
 #define PUBLIC_MSG "PUBL"
-#define PRIVATE "PRIV"
+#define PRIVATE_MSG "PRIV"
 #define PRIVATE_OK "PROK"
 #define PRIVATE_ERR "PERR"
 #define LIST "LIST"

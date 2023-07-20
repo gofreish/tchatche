@@ -15,8 +15,6 @@ void new_connection(int read_pipe, int *last_free_id, entete en_tete, int *total
     char *pseudo = (char*)malloc((en_tete.size-8+1)*sizeof(char));
     read(read_pipe, pseudo, en_tete.size-8);
 
-    printf("new conn Pseudo=%s\nNew connection\n", pseudo);
-
     if( find_client_by_pseudo(*total_client, client_list, pseudo) != NULL ){
         printf("Personne trouver\n");
         say_connection_failled_to_client("Pseudo deja utiliser");
@@ -28,10 +26,12 @@ void new_connection(int read_pipe, int *last_free_id, entete en_tete, int *total
         //on ajoute le client
         client_list[*total_client] = cl;
         *total_client = *total_client+1;
-        printf("Pseudo valide\n");
         
         //On lui envoit son identifiant
         say_connected_to_client(*cl, "Connected");
+        //on ouvre et on attend qu'il ouvre
+        cl->tube_write_desc = open(cl->pipe, O_WRONLY);
+        printf("Client %s connecter\n", cl->pseudo);
     }
     free(pseudo);
 }
@@ -44,10 +44,12 @@ void say_connected_to_client( client cl, char *message ){
     strcat(reponse, CONNECTION_SUCCESS);
     to4char(cl.id, 8, reponse);
     strcat(reponse, message);
-    printf("To client : %s\n", reponse);
-
+    
     //Envoi de la reponse
-    send_to_client(cl, reponse);
+    int write_client_pipe = open(TUBE_REPONSE_CONNECTION_SERVEUR, O_WRONLY);
+    write(write_client_pipe, reponse, size);
+    close(write_client_pipe);
+    free(reponse);
 }
 
 void say_connection_failled_to_client(char *msg){
@@ -63,4 +65,5 @@ void say_connection_failled_to_client(char *msg){
     int write_client_pipe = open(TUBE_REPONSE_CONNECTION_SERVEUR, O_WRONLY);
     write(write_client_pipe, reponse, size);
     close(write_client_pipe);
+    free(reponse);
 }

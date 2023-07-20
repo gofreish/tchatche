@@ -1,8 +1,12 @@
+#include "outils.h"
+#include "structures.h"
+#include "cste.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include "structures.h"
+#include <ctype.h>
 
 void to4char(long size, int begin_index, char *result)
 {
@@ -45,13 +49,34 @@ void to4char(long size, int begin_index, char *result)
         result[begin_index+1]=char_size[1];
         result[begin_index+2]=char_size[2];
         result[begin_index+3]=char_size[3];
-    }    
+    }
+    result[begin_index+4]='\0';    
+}
+
+void strupr(char *str){
+    int i=0;
+    while (str[i]!='\0')
+    {
+        str[i] = toupper(str[i]);
+        i++;
+    }
 }
 
 void read_entete_in_pipe(int read_desc, entete *en_tete){
     char *rep_size = (char*)malloc(5*sizeof(char));
     read(read_desc, rep_size, 4);
+    rep_size[4]='\0';
     en_tete->size = atoi(rep_size);
 
     read(read_desc, en_tete->cmd, 4);
+    en_tete->cmd[4]='\0';
+}
+
+void fill_client(int read_desc, client *cl){
+    //on lit l identifiant
+    char *identifiant = (char*)malloc(5*sizeof(char));
+    read(read_desc, identifiant, 4);
+    cl->id = atoi(identifiant);
+    //on cree le chemin du tube
+    sprintf(cl->pipe, "%s_%d", TUBE_CLIENT_PREFIX, cl->id);
 }

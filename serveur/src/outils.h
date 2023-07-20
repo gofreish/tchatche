@@ -8,6 +8,12 @@
 void to4char(long size, int begin_index, char *result);
 
 /**
+ * Cette focntion convertis une chaine en MAJUSCULE
+ * @param str la chaine a mettre en majuscule
+*/
+void strupr(char *str);
+
+/**
  * Cette fonction recupere la commande de la saisie
  * l utilisateur si il y en a. 
  * Il renvoit l'index de la derniere lettre de la commande.
